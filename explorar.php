@@ -6,27 +6,23 @@ $emocion = isset($_GET['emocion']) ? $_GET['emocion'] : '';
 $estilo = isset($_GET['estilo']) ? $_GET['estilo'] : '';
 
 // Base SQL
-$sql = "SELECT titulo, descripcion, imagen_url, estilo, emocion FROM tu_arte";
-$conditions = [];
-$params = [];
-$types = "";
 
-// Construir condiciones
-if ($emocion) {
-    $conditions[] = "emocion = ?";
-    $params[] = $emocion;
-    $types .= "s";
+$sql = "SELECT * FROM tu_arte WHERE 1=1";
+
+if (!empty($_GET['emocion'])) {
+    $sql .= " AND emocion = '" . $_GET['emocion'] . "'";
 }
-if ($estilo) {
-    $conditions[] = "estilo = ?";
-    $params[] = $estilo;
-    $types .= "s";
+if (!empty($_GET['estilo'])) {
+    $sql .= " AND estilo = '" . $_GET['estilo'] . "'";
 }
 
-// Agregar condiciones a la consulta
-if (count($conditions) > 0) {
-    $sql .= " WHERE " . implode(" AND ", $conditions);
+
+if (!empty($_GET['q'])) {
+    $sql .= " AND (titulo LIKE '%" . $_GET['q'] . "%' OR descripcion LIKE '%" . $_GET['q'] . "%')";
 }
+
+
+$sql .= " ORDER BY RAND()";
 
 $stmt = $conn->prepare($sql);
 
