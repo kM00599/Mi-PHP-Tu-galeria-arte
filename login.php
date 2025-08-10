@@ -1,10 +1,20 @@
 <?php
 include('conexion.php');
+ini_set('session.use_strict_mode', 1);
+session_set_cookie_params([
+    'httponly' => true,
+    'secure'   => isset($_SERVER['HTTPS']), // en producción, true siempre
+    'samesite' => 'Lax'
+]);
 session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST["email"];
-    $password = $_POST["password"];
+    $email = strtolower(trim($_POST["email"] ?? ''));
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    echo "Formato de correo inválido";
+    exit();
+}
+$password = $_POST["password"] ?? '';
 
     $sql = "SELECT * FROM users WHERE email=?";
     $stmt = $conn->prepare($sql);
